@@ -1,12 +1,16 @@
+#ifndef _DATA_H_
+#define _DATA_H_
+#include "common.h"
 #ifdef _DATA_C_
 #define EXTERN
 #else
 #define EXTERN extern
 #endif
+
 typedef struct candidate Candidate;
 typedef struct candidate
 {
-	int numbers[3][3];
+	int numbers[DIM][DIM];
 //	int count;
 	Candidate *next;
 	Candidate *prev;
@@ -20,10 +24,10 @@ typedef struct searchspace
 	Candidate *current;
 };
 
-EXTERN Searchspace searchspace[3][3];
+EXTERN Searchspace searchspace[DIM][DIM];
 
 #ifdef _DATA_C_
-int box[3][3][3][3] =
+int box[DIM][DIM][DIM][DIM] =
 {
 	/* 1st row */
 	{
@@ -83,29 +87,30 @@ int box[3][3][3][3] =
 	}
 };
 
-int map[9][9] =
+int map[NUMS_IN_DIM][NUMS_IN_DIM] =
 {
-	{ -1, -2, -3, -4, -5, -6, -7, -8, -9 },
-	{ -1, -2, -3, -4, -5, -6, -7, -8, -9 },
-	{ -1, -2, -3, -4, -5, -6, -7, -8, -9 },
-	{ -1, -2, -3, -4, -5, -6, -7, -8, -9 },
-	{ -1, -2, -3, -4, -5, -6, -7, -8, -9 },
-	{ -1, -2, -3, -4, -5, -6, -7, -8, -9 },
-	{ -1, -2, -3, -4, -5, -6, -7, -8, -9 },
-	{ -1, -2, -3, -4, -5, -6, -7, -8, -9 },
-	{ -1, -2, -3, -4, -5, -6, -7, -8, -9 },
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0 },
+	{  0,  0,  0,  0,  0,  0,  0,  0,  0 }
 };
 
 #else
-EXTERN int box[3][3][3][3];
-EXTERN int map[9][9];
+EXTERN int box[DIM][DIM][DIM][DIM];
+EXTERN int map[NUMS_IN_DIM][NUMS_IN_DIM];
 #endif
 
-EXTERN Candidate* NewCandidate(int numbers[][3]);
+EXTERN Candidate* NewCandidate(int numbers[][DIM]);
 EXTERN void InitData();
-EXTERN void InsertCandidate(Candidate *ptr, int boxcoord[2]);
-EXTERN void DeleteCandidate(Candidate *ptr, int boxcoord[2]);
+EXTERN void InsertCandidate(Candidate *ptr, int boxcoord[PAIR]);
+EXTERN void DeleteCandidate(Candidate *ptr, int boxcoord[PAIR]);
 EXTERN void VerifyList(Searchspace searchspace);
 
 //int matchseq[3][2] = {{0,1}, {1,2}, {0,2}};
-EXTERN Candidate *poss[3][3];
+EXTERN Candidate *poss[DIM][DIM];
+#endif

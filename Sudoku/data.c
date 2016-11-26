@@ -10,9 +10,9 @@ void InitData()
 {
 	int i = 0, j = 0;
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < DIM; i++)
 	{
-		for (j = 0; j < 3; j++)
+		for (j = 0; j < DIM; j++)
 		{
 			searchspace[i][j].candidates = NULL;
 			searchspace[i][j].count = 0;
@@ -29,9 +29,9 @@ Candidate* NewCandidate(int numbers[][3])
 
 	if (ptr != NULL)
 	{
-		for (i = 0; i < 3; i++)
+		for (i = 0; i < DIM; i++)
 		{
-			for (j = 0; j < 3; j++)
+			for (j = 0; j < DIM; j++)
 			{
 				ptr->numbers[i][j] = numbers[i][j];
 
@@ -96,6 +96,7 @@ void VerifyList(Searchspace searchspace)
 	Candidate *lastptr = NULL;
 	Candidate *ptr = searchspace.candidates;
 	int count = searchspace.count;
+
 	while (ptr != NULL)
 	{
 		lastptr = ptr;
@@ -103,12 +104,10 @@ void VerifyList(Searchspace searchspace)
 		nelem++;
 	}
 
-
 	if (count != nelem)
 	{
 		printf("Fatal :: List number of element mismatch.\n");
 	}
-	
 	
 	ptr = lastptr;
 	nelem = 0;

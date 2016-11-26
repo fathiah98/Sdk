@@ -1,24 +1,23 @@
 #include <stdio.h>
+#include "common.h"
 #include "data.h"
 #include "datalogger.h"
-#define MAXCOMBI 9*8*7*6*5*4*3*2
+
 //#define PRINT_PERMUTATIONS
-void FindMissing(int input[3][3], int output[], int *missingcount);
+void FindMissing(int input[DIM][DIM], int output[], int *missingcount);
 void Permutate(int input[], int ninput, int currindex, int *count);
-void FindMissingIndices(int box[][3], int output[][2]);
+void FindMissingIndices(int box[][DIM], int output[][PAIR]);
 void CreateBoxData(int results[], int box[][3]);
 void Reduce(int coord[]);
 void Search();
-unsigned char TraverseBox(int row, int col, int rowcol);
+unsigned char TraverseBox(int row, int col);
 unsigned char IsCompatible();
 void WriteToMap(Candidate *ptr, int boxrow, int boxcol);
 void ResetMap(int boxrow, int boxcol);
 //unsigned char FindCandidate(int orgrow, int orgcol, int destrow, int destcol);
 
-//int searchspace[9][MAXCOMBI][9] = {0};
-//int candidates[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-int missingindices[9][2] = { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } };
+int missingindices[NUMS_IN_DIM][PAIR] = { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } };
 int missing[9];
 int missingcount = 0;
 int boxcoord[2] = { 0,0 };
@@ -30,10 +29,10 @@ void main()
 
 	InitData();
 	initLogger();
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < DIM; i++)
 	{
 		boxcoord[0] = i;
-		for (j = 0; j < 3; j++)
+		for (j = 0; j < DIM; j++)
 		{
 			boxcoord[1] = j;
 			FindMissing(box[boxcoord[0]][boxcoord[1]], missing, &missingcount);
@@ -62,13 +61,13 @@ void Reduce(int coord[])
 	{
 		failed = 0;
 
-		for (boxcolumn = 0; boxcolumn < 3; boxcolumn++)
+		for (boxcolumn = 0; boxcolumn < DIM; boxcolumn++)
 		{
 			if (boxcolumn != coord[1])
 			{
-				for (i = 0; i < 3; i++)
+				for (i = 0; i < DIM; i++)
 				{
-					for (j = 0; j < 3; j++)
+					for (j = 0; j < DIM; j++)
 					{
 						if (box[coord[0]][boxcolumn][i][0] == ptr->numbers[i][j] ||
 							box[coord[0]][boxcolumn][i][1] == ptr->numbers[i][j] || 
@@ -76,9 +75,9 @@ void Reduce(int coord[])
 						{
 							/* found a corresponding square in the same box row both the search space and the unfilled box 
 							with the same number, fail the search delete the current search space.*/
-							j = 3;
-							i = 3;
-							boxcolumn = 3;
+							j = DIM;
+							i = DIM;
+							boxcolumn = DIM;
 							failed = 1;
 						}
 					}
@@ -88,13 +87,13 @@ void Reduce(int coord[])
 		/* If box row checking has failed do not bother checking column, else check adjacent columns. */
 		if (failed == 0)
 		{
-			for (boxrow = 0; boxrow < 3; boxrow++)
+			for (boxrow = 0; boxrow < DIM; boxrow++)
 			{
 				if (boxrow != coord[0])
 				{
-					for (i = 0; i < 3; i++)
+					for (i = 0; i < DIM; i++)
 					{
-						for (j = 0; j < 3; j++)
+						for (j = 0; j < DIM; j++)
 						{
 							if (box[boxrow][coord[1]][0][j] == ptr->numbers[i][j] ||
 								box[boxrow][coord[1]][1][j] == ptr->numbers[i][j] ||
@@ -103,9 +102,9 @@ void Reduce(int coord[])
 								/* found a corresponding square in the same box column both the search space and the unfilled box
 								with the same number, fail the search delete the current search space.*/
 
-								j = 3;
-								i = 3;
-								boxrow = 3;
+								j = DIM;
+								i = DIM;
+								boxrow = DIM;
 								failed = 1;
 							}
 						}
@@ -128,68 +127,72 @@ void Search()
 {
 // this is a variable node per level tree search.
 	unsigned char results = 0;
-	int i=0;
-	int j = 0;
+	int row=0;
+//	int j = 0;
 	int col = 0;
 	unsigned char done = 0;
 
 	/*initialize poss[][] before the search starts*/
-	for (i = 0; i < 3; i++)
+	for (row = 0; row < DIM; row++)
 	{
-		for (j = 0; j < 3; j++)
+		for (col = 0; col < DIM; col++)
 		{
-			poss[i][j] = searchspace[i][j].candidates;
+			poss[row][col] = searchspace[row][col].candidates;
 		}
 	}
 
 	// ROW-WISE SEARCH -- start from box col 0
 	col = 0;
-	for(i=0;i<3;i++) // i <- box row, find solutions for all box rows
+	row = 0;
+	done = 0;
+	while(!done) // i <- box row, find solutions for all box rows
 	{
 		// while the root node (box )still has a valid candidate, 
 		// and no total successful match across the ith box row, keep looping
-//		while (poss[i][col] != NULL && done == 0)
-//		{
-			results = TraverseBox(i, col, 1); /*ith box row, next column*/
-//			if(results == 0)
-//			{
-//				poss[i][col] = poss[i][col]->next;
-//			}
-//			else
-//			{
-//				done = 1;
-//			}
-//		}
-//		if (poss[i][col] == NULL)
-//		{
-//			i = 3; /*exit the for loop*/
-//		}
+		results = TraverseBox(row, col); /*ith box row, next column*/
+		if(results == 0)
+		{
+			if (row > 0)
+			{
+				ResetMap(row, col);
+				poss[row][col] = searchspace[row][col].candidates;
+				row = row - 1;
+				poss[row][DIM - 1] = poss[row][DIM - 1]->next;
+				ResetMap(row, DIM - 1);
+			}
+			else
+			{
+				done = 1;
+			}
+		}
+		else
+		{
+			row++;
+		}
+
+		if (row >= DIM)
+		{
+			done = 1;
+		}
+		
 	}
 }
 
-unsigned char TraverseBox(int row, int col, int rowcol)
+unsigned char TraverseBox(int row, int col)
 {
 	int results = 0;
 	unsigned int done = 0;
-	int i, j;
+//	int i, j;
 	while (poss[row][col] != NULL && done == 0)
 	{
 		WriteToMap(poss[row][col], row, col);
 		results = IsCompatible();
 		if(results == 1)
 		{
-			if ((col + 1) < 3) // because there are three boxes per row and column
+			if ((col + 1) < DIM) // because there are three boxes per row and column
 			{
 //				poss[row][col + 1] = searchspace[row][col + 1].candidates;
-				if (rowcol == 1)
-				{
-					results = TraverseBox(row, col + 1, 1);
-					
-				}
-				else
-				{
-					results = TraverseBox(row+1, col, 0);
-				}
+				results = TraverseBox(row, col + 1);
 				done = results;
 				/* 
 					If there is no match in the child node, reset the child node start pointer to the beginning of the candidate list.
@@ -221,11 +224,11 @@ void WriteToMap(Candidate *ptr, int boxrow, int boxcol)
 	int i;
 	int j;
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < DIM; i++)
 	{
-		for (j = 0; j < 3; j++)
+		for (j = 0; j < DIM; j++)
 		{
-			map[boxrow * 3+i][boxcol * 3+j] = ptr->numbers[i][j];
+			map[boxrow * DIM + i][boxcol * DIM + j] = ptr->numbers[i][j];
 		}
 	}
 	
@@ -236,11 +239,11 @@ void ResetMap(int boxrow, int boxcol)
 	int i;
 	int j;
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < DIM; i++)
 	{
-		for (j = 0; j < 3; j++)
+		for (j = 0; j < DIM; j++)
 		{
-			map[boxrow * 3 + i][boxcol * 3 + j] = (-1)*(boxcol * 3 + j+1);
+			map[boxrow * DIM + i][boxcol * DIM + j] = 0;
 		}
 	}
 
@@ -255,13 +258,15 @@ unsigned char IsCompatible()
 	int k = 0;
 	unsigned char done = 0;
 	/* checking the rows */
-	for (i = 0; (i < 9) && (done == 0); i++)
+	for (i = 0; (i < NUMS_IN_DIM) && (done == 0); i++)
 	{
-		for (j = 0; (j < 9 - 1) && (done == 0); j++)
+		for (j = 0; (j < NUMS_IN_DIM - 1) && (done == 0); j++)
 		{
-			for (k = j + 1; (k < 9) && (done == 0); k++)
+			for (k = j + 1; (k < NUMS_IN_DIM) && (done == 0); k++)
 			{
-				if (map[i][j] == map[i][k])
+				if ((map[i][j] == map[i][k]) &&
+					map[i][j] != 0 &&
+					map[i][k] != 0 )
 				{
 					done = 1; 
 					results = 0;
@@ -272,7 +277,23 @@ unsigned char IsCompatible()
 	/* Don't bother checking if the row check faiiled.*/
 	if (results == 1)
 	{
-	}
+		/* checking the columns */
+		for (i = 0; (i < NUMS_IN_DIM) && (done == 0); i++)
+		{
+			for (j = 0; (j < NUMS_IN_DIM - 1) && (done == 0); j++)
+			{
+				for (k = j + 1; (k < NUMS_IN_DIM) && (done == 0); k++)
+				{
+					if ((map[j][i] == map[k][i]) &&
+						(map[j][i] != 0) &&
+						(map[k][i] != 0))
+					{
+						done = 1;
+						results = 0;
+					}
+				}
+			}
+		}
 	}
 	return(results);
 }
@@ -335,9 +356,9 @@ void FindMissingIndices(int box[][3], int output[][2])
 	int i = 0, j = 0;
 	int outputcount = 0;
 
-	for (i = 0; i < 3; i++) // row
+	for (i = 0; i < DIM; i++) // row
 	{
-		for (j = 0; j < 3; j++) // column
+		for (j = 0; j < DIM; j++) // column
 		{
 			if (box[i][j] == 0)
 			{
@@ -348,7 +369,7 @@ void FindMissingIndices(int box[][3], int output[][2])
 	}
 }
 
-void FindMissing(int input[3][3], int output[], int *missingcount)
+void FindMissing(int input[DIM][DIM], int output[], int *missingcount)
 {
 	int row = 0;
 	int column = 0;
@@ -356,14 +377,14 @@ void FindMissing(int input[3][3], int output[], int *missingcount)
 	int temp[9];
 	*missingcount = 0;
 
-	for (i = 0; i < 9; i++)
+	for (i = 0; i < NUMS_IN_DIM; i++)
 	{
 		output[i] = 0;
 		temp[i] = 0;
 	}
-	for (row = 0; row < 3; row++)
+	for (row = 0; row < DIM; row++)
 	{
-		for (column = 0; column < 3; column++)
+		for (column = 0; column < DIM; column++)
 		{
 			if (input[row][column] != 0)
 			{
@@ -371,7 +392,7 @@ void FindMissing(int input[3][3], int output[], int *missingcount)
 			}
 		}
 	}
-	for (i = 0; i < 9; i++)
+	for (i = 0; i < NUMS_IN_DIM; i++)
 	{
 		if (temp[i] != -1)
 		{
@@ -385,9 +406,9 @@ void Permutate(int input[], int ninput, int currindex, int *count)
 {
 	int i = 0;
 	int temp = 0;
-	int nextstage[9];
-	int results[9];
-	int resultsbox[3][3];
+	int nextstage[NUMS_IN_DIM];
+	int results[NUMS_IN_DIM];
+	int resultsbox[DIM][DIM];
 
 	for (i = 0; i<ninput; i++)
 	{
@@ -444,9 +465,9 @@ void CreateBoxData(int results[], int boxdata[][3])
 	int i, j = 0;
 	int count = 0;
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < DIM; i++)
 	{
-		for (j = 0; j < 3; j++)
+		for (j = 0; j < DIM; j++)
 		{
 			boxdata[i][j] = box[boxcoord[0]][boxcoord[1]][i][j];
 			if (boxdata[i][j] == 0)

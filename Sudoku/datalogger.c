@@ -3,9 +3,10 @@
 #include <stdio.h>
 #include "data.h"
 #include "datalogger.h"
+#define FILENAME_LENGTH	20
 
 FILE *fp;
-char fname[20] = "logger.txt";
+char fname[FILENAME_LENGTH] = "logger.txt";
 
 void initLogger()
 {
