@@ -1,6 +1,7 @@
 #define _DATA_C_
 #include "data.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 // Each box is 3x3 array of integers.
 
@@ -13,7 +14,9 @@ void InitData()
 	{
 		for (j = 0; j < 3; j++)
 		{
-			searchspace[i][j] = NULL;
+			searchspace[i][j].candidates = NULL;
+			searchspace[i][j].count = 0;
+			searchspace[i][j].current = NULL;
 		}
 	}
 }
@@ -43,14 +46,17 @@ Candidate* NewCandidate(int numbers[][3])
 /* Insert Candidate to the front of the list */
 void InsertCandidate(Candidate *ptr, int boxcoord[2])
 {
-	ptr->next = searchspace[boxcoord[0]][boxcoord[1]];
+//	Candidate *headptr = searchspace[boxcoord[0]][boxcoord[1]].candidates;
+	ptr->next = searchspace[boxcoord[0]][boxcoord[1]].candidates;
 
-	if (searchspace[boxcoord[0]][boxcoord[1]] != NULL)
+	if (searchspace[boxcoord[0]][boxcoord[1]].candidates != NULL)
 	{
-		searchspace[boxcoord[0]][boxcoord[1]]->prev = ptr;
+		searchspace[boxcoord[0]][boxcoord[1]].candidates->prev = ptr;
 	}
-	searchspace[boxcoord[0]][boxcoord[1]] = ptr;
-	nsearchspace[boxcoord[0]][boxcoord[1]] = nsearchspace[boxcoord[0]][boxcoord[1]] + 1;
+
+	searchspace[boxcoord[0]][boxcoord[1]].candidates = ptr;
+	searchspace[boxcoord[0]][boxcoord[1]].count++;
+	searchspace[boxcoord[0]][boxcoord[1]].current = ptr;
 }
 
 /* Delete the struct using a pointer to it */
@@ -67,7 +73,7 @@ void DeleteCandidate(Candidate *ptr, int coord[2])
 		}
 		else
 		{
-			searchspace[coord[0]][coord[1]] = ptr->next;
+			searchspace[coord[0]][coord[1]].candidates = ptr->next;
 		}
 
 		next_node = ptr->next;
@@ -79,14 +85,17 @@ void DeleteCandidate(Candidate *ptr, int coord[2])
 		
 
 		free(ptr);
-		nsearchspace[coord[0]][coord[1]] = nsearchspace[coord[0]][coord[1]] - 1;
+		searchspace[coord[0]][coord[1]].count--;
+		searchspace[coord[0]][coord[1]].current = searchspace[coord[0]][coord[1]].candidates;
 	}
 }
 
-void VerifyList(Candidate *ptr, int count)
+void VerifyList(Searchspace searchspace)
 {
 	int nelem = 0;
 	Candidate *lastptr = NULL;
+	Candidate *ptr = searchspace.candidates;
+	int count = searchspace.count;
 	while (ptr != NULL)
 	{
 		lastptr = ptr;

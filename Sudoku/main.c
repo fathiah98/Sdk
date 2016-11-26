@@ -1,12 +1,19 @@
 #include <stdio.h>
 #include "data.h"
+#include "datalogger.h"
 #define MAXCOMBI 9*8*7*6*5*4*3*2
-#define PRINT_PERMUTATIONS
+//#define PRINT_PERMUTATIONS
 void FindMissing(int input[3][3], int output[], int *missingcount);
 void Permutate(int input[], int ninput, int currindex, int *count);
 void FindMissingIndices(int box[][3], int output[][2]);
 void CreateBoxData(int results[], int box[][3]);
 void Reduce(int coord[]);
+void Search();
+unsigned char TraverseBox(int row, int col, int rowcol);
+unsigned char IsCompatible();
+void WriteToMap(Candidate *ptr, int boxrow, int boxcol);
+void ResetMap(int boxrow, int boxcol);
+//unsigned char FindCandidate(int orgrow, int orgcol, int destrow, int destcol);
 
 //int searchspace[9][MAXCOMBI][9] = {0};
 //int candidates[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -22,19 +29,22 @@ void main()
 	int i, j = 0;
 
 	InitData();
+	initLogger();
 	for (i = 0; i < 3; i++)
 	{
 		boxcoord[0] = i;
 		for (j = 0; j < 3; j++)
 		{
 			boxcoord[1] = j;
-			FindMissing(box[boxcoord[0]][boxcoord[0]], missing, &missingcount);
-			FindMissingIndices(box[boxcoord[0]][boxcoord[0]], missingindices);
+			FindMissing(box[boxcoord[0]][boxcoord[1]], missing, &missingcount);
+			FindMissingIndices(box[boxcoord[0]][boxcoord[1]], missingindices);
 			Permutate(missing, missingcount, 0, &count);
-			VerifyList(searchspace[boxcoord[0]][boxcoord[1]], nsearchspace[boxcoord[0]][boxcoord[1]]);
+			VerifyList(searchspace[boxcoord[0]][boxcoord[1]]);
 			Reduce(boxcoord);
+			WriteSearchSpace(boxcoord[0],boxcoord[1]);
 		}
 	}
+	Search();
 }
 /*
 	Given a box coordinates out of a possible [3][3], scan the four adjacent neighbours 
@@ -43,7 +53,7 @@ void main()
 */
 void Reduce(int coord[])
 {
-	Candidate *ptr = searchspace[coord[0]][coord[1]];
+	Candidate *ptr = searchspace[coord[0]][coord[1]].candidates;
 	Candidate *delptr;
 	unsigned char failed = 0;
 	int boxrow, boxcolumn, i, j;
@@ -108,23 +118,215 @@ void Reduce(int coord[])
 		if (failed == 1)
 		{
 			DeleteCandidate(delptr,coord);
-			VerifyList(searchspace[coord[0]][coord[1]], nsearchspace[coord[0]][coord[1]]);
+			VerifyList(searchspace[coord[0]][coord[1]]);
 		}
 	}
 }
 
 
-unsigned char IsExistInOtherBoxes(int num, int boxcoord[])
+void Search()
 {
+// this is a variable node per level tree search.
 	unsigned char results = 0;
-	int box_row = 0;
-	int box_column = 0;
-	int num_row = 0; 
-	int num_column = 0;
+	int i=0;
+	int j = 0;
+	int col = 0;
+	unsigned char done = 0;
 
+	/*initialize poss[][] before the search starts*/
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 3; j++)
+		{
+			poss[i][j] = searchspace[i][j].candidates;
+		}
+	}
+
+	// ROW-WISE SEARCH -- start from box col 0
+	col = 0;
+	for(i=0;i<3;i++) // i <- box row, find solutions for all box rows
+	{
+		// while the root node (box )still has a valid candidate, 
+		// and no total successful match across the ith box row, keep looping
+//		while (poss[i][col] != NULL && done == 0)
+//		{
+			results = TraverseBox(i, col, 1); /*ith box row, next column*/
+//			if(results == 0)
+//			{
+//				poss[i][col] = poss[i][col]->next;
+//			}
+//			else
+//			{
+//				done = 1;
+//			}
+//		}
+//		if (poss[i][col] == NULL)
+//		{
+//			i = 3; /*exit the for loop*/
+//		}
+	}
+}
+
+unsigned char TraverseBox(int row, int col, int rowcol)
+{
+	int results = 0;
+	unsigned int done = 0;
+	int i, j;
+	while (poss[row][col] != NULL && done == 0)
+	{
+		WriteToMap(poss[row][col], row, col);
+		results = IsCompatible();
+		if(results == 1)
+		{
+			if ((col + 1) < 3) // because there are three boxes per row and column
+			{
+//				poss[row][col + 1] = searchspace[row][col + 1].candidates;
+				if (rowcol == 1)
+				{
+					results = TraverseBox(row, col + 1, 1);
+					
+				}
+				else
+				{
+					results = TraverseBox(row+1, col, 0);
+				}
+				done = results;
+				/* 
+					If there is no match in the child node, reset the child node start pointer to the beginning of the candidate list.
+				    Also reset the map space occupied by the previous candidate 
+				*/
+				if (results == 0)
+				{
+					poss[row][col + 1] = searchspace[row][col + 1].candidates;
+					ResetMap(row, col + 1);
+					poss[row][col] = poss[row][col]->next;
+				}
+			}
+			else
+			{
+				done = 1;
+			}
+		}
+		else
+		{
+			poss[row][col] = poss[row][col]->next;
+		}
+	}
 
 	return(results);
 }
+
+void WriteToMap(Candidate *ptr, int boxrow, int boxcol)
+{
+	int i;
+	int j;
+
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 3; j++)
+		{
+			map[boxrow * 3+i][boxcol * 3+j] = ptr->numbers[i][j];
+		}
+	}
+	
+}
+
+void ResetMap(int boxrow, int boxcol)
+{
+	int i;
+	int j;
+
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 3; j++)
+		{
+			map[boxrow * 3 + i][boxcol * 3 + j] = (-1)*(boxcol * 3 + j+1);
+		}
+	}
+
+}
+
+
+unsigned char IsCompatible()
+{
+	int results = 1;
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	unsigned char done = 0;
+	/* checking the rows */
+	for (i = 0; (i < 9) && (done == 0); i++)
+	{
+		for (j = 0; (j < 9 - 1) && (done == 0); j++)
+		{
+			for (k = j + 1; (k < 9) && (done == 0); k++)
+			{
+				if (map[i][j] == map[i][k])
+				{
+					done = 1; 
+					results = 0;
+				}
+			}
+		}
+	}
+	/* Don't bother checking if the row check faiiled.*/
+	if (results == 1)
+	{
+	}
+	}
+	return(results);
+}
+
+/*
+unsigned char FindCandidate(int orgrow, int orgcol, int destrow, int destcol)
+{
+	unsigned char results = 0;
+	unsigned char done = 0;
+	int i, j =0;
+	Searchspace orgbox=searchspace[orgrow][orgcol];
+	Searchspace destbox=searchspace[destrow][destcol];
+	Candidate *orgptr = orgbox.current;
+	Candidate *destptr = destbox.current;
+	int matchcount = 0;
+
+	while(done == 0)
+	{
+		for(i=0;i<3;i++)
+		{
+			for(j=0;j<3;j++)
+			{
+				if(orgptr->numbers[i][j] == destptr->numbers[i][0] ||
+				   orgptr->numbers[i][j] == destptr->numbers[i][1] ||
+				   orgptr->numbers[i][j] == destptr->numbers[i][2])
+				{
+					matchcount = 0;
+					if(destptr->next != NULL)
+					{
+						destptr = destptr->next;
+						i = -1; j = 3;
+						destbox.current = destptr;
+					}
+					else
+					{
+						i=3;j=3;results = 0;
+					}
+				}
+
+				else
+				{
+					matchcount++;
+				}
+			}
+		}
+		if(matchcount == 9)
+		{
+			done = 1;
+			results = 1;
+		}
+	}
+	return(results);
+}
+*/
 
 
 
