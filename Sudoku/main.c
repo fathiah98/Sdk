@@ -9,11 +9,12 @@ void Permutate(int input[], int ninput, int currindex, int *count);
 void FindMissingIndices(int box[][DIM], int output[][PAIR]);
 void CreateBoxData(int results[], int box[][3]);
 void Reduce(int coord[]);
-void Search();
+unsigned char Search();
 unsigned char TraverseBox(int row, int col);
 unsigned char IsCompatible();
 void WriteToMap(Candidate *ptr, int boxrow, int boxcol);
 void ResetMap(int boxrow, int boxcol);
+void ShowSolution();
 //unsigned char FindCandidate(int orgrow, int orgcol, int destrow, int destcol);
 
 
@@ -43,7 +44,15 @@ void main()
 			WriteSearchSpace(boxcoord[0],boxcoord[1]);
 		}
 	}
-	Search();
+	if (Search() == 1)
+	{
+		ShowSolution();
+	}
+	else
+	{
+		printf("Cannot find a solution!\n");
+	}
+
 }
 /*
 	Given a box coordinates out of a possible [3][3], scan the four adjacent neighbours 
@@ -123,7 +132,7 @@ void Reduce(int coord[])
 }
 
 
-void Search()
+unsigned char Search()
 {
 // this is a variable node per level tree search.
 	unsigned char results = 0;
@@ -176,6 +185,7 @@ void Search()
 		}
 		
 	}
+	return(results);
 }
 
 unsigned char TraverseBox(int row, int col)
@@ -478,3 +488,28 @@ void CreateBoxData(int results[], int boxdata[][3])
 	}
 }
 
+void ShowSolution()
+{
+	int boxrow,boxcol,i,j;
+
+	for (i = 0; i < NUMS_IN_DIM; i++)
+	{
+		for (j = 0; j < NUMS_IN_DIM; j++)
+		{
+			printf("%d ", map[i][j]);
+			if ((j + 1) % DIM == 0)
+			{
+				printf("| ");
+			}
+		}
+		printf("\n");
+		if ((i<NUMS_IN_DIM-1)&&((i + 1) % DIM == 0))
+		{
+			for (j = 0; j < 2 * (NUMS_IN_DIM + DIM); j++)
+			{
+				printf("-");
+			}
+			printf("\n");
+		}
+	}
+}
