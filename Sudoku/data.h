@@ -1,10 +1,12 @@
 #ifndef _DATA_H_
 #define _DATA_H_
+
 #include "common.h"
+
 #ifdef _DATA_C_
-#define EXTERN
+#define EXTERNDATA
 #else
-#define EXTERN extern
+#define EXTERNDATA extern
 #endif
 
 typedef struct candidate Candidate;
@@ -24,9 +26,10 @@ typedef struct searchspace
 	Candidate *current;
 };
 
-EXTERN Searchspace searchspace[DIM][DIM];
+EXTERNDATA Searchspace searchspace[DIM][DIM];
 
 #ifdef _DATA_C_
+#if 0
 int box[DIM][DIM][DIM][DIM] =
 {
 	/* 1st row */
@@ -86,7 +89,178 @@ int box[DIM][DIM][DIM][DIM] =
 		}
 	}
 };
+#endif
+#if 0
+int box[DIM][DIM][DIM][DIM] =
+{
+	{
+		{
+			{ 0, 0, 2 },
+			{ 5, 0, 0 },
+			{ 0, 0, 0 }
+		},
+		{
+			{ 0, 5, 9 },
+			{ 0, 0, 0 },
+			{ 0, 7, 1 }
+		},
+		{
+			{ 0, 0, 0 },
+			{ 0, 0, 7 },
+			{ 4, 6, 0 }
+		}
+	},
+	{
+		{
+			{ 6, 0, 0 },
+			{ 0, 0, 3 },
+			{ 9, 0, 0 }
+		},
+		{
+			{ 8, 3, 0 },
+			{ 0, 6, 0 },
+			{ 0, 1, 2 }
+		},
+		{
+			{ 0, 0, 9 },
+			{ 8, 0, 0 },
+			{ 0, 0, 4 }
+		},
 
+	},
+	{
+		{
+			{ 0, 7, 6 },
+			{ 4, 0, 0 },
+			{ 0, 0, 0 }
+		},
+		{
+			{ 1, 2, 0 },
+			{ 0, 0, 0 },
+			{ 3, 4, 0 }
+		},
+		{
+			{ 0, 0, 0 },
+			{ 0, 0, 1 },
+			{ 5, 0, 0 }
+		},
+	}
+};
+#endif
+
+#if 0
+int box[DIM][DIM][DIM][DIM] =
+{
+	{
+		{
+			{ 0, 0, 0 },
+			{ 0, 0, 6 },
+			{ 0, 9, 0 }
+		},
+		{
+			{ 0, 6, 3 },
+			{ 9, 0, 5 },
+			{ 0, 0, 0 }
+		},
+		{
+			{ 0, 0, 0 },
+			{ 7, 0, 0 },
+			{ 0, 0, 0 }
+		}
+	},
+	{
+		{
+			{ 0, 8, 3 },
+			{ 4, 6, 0 },
+			{ 1, 0, 0 }
+		},
+		{
+			{ 0, 0, 6 },
+			{ 0, 7, 0 },
+			{ 3, 0, 0 }
+		},
+		{
+			{ 0, 0, 7 },
+			{ 0, 3, 8 },
+			{ 4, 2, 0 }
+		},
+
+	},
+	{
+		{
+			{ 0, 0, 0 },
+			{ 0, 0, 1 },
+			{ 0, 0, 0 }
+		},
+		{
+			{ 0, 0, 0 },
+			{ 8, 0, 7 },
+			{ 4, 2, 0 }
+		},
+		{
+			{ 0, 9, 0 },
+			{ 5, 0, 0 },
+			{ 0, 0, 0 }
+		},
+	}
+};
+#endif
+
+int box[DIM][DIM][DIM][DIM] =
+{
+	{
+		{
+			{ 0, 0, 0 },
+			{ 4, 0, 0 },
+			{ 0, 0, 1 }
+		},
+		{
+			{ 0, 0, 7 },
+			{ 0, 5, 9 },
+			{ 0, 2, 0 }
+		},
+		{
+			{ 5, 9, 0 },
+			{ 2, 0, 0 },
+			{ 8, 0, 0 }
+		}
+	},
+	{
+		{
+			{ 0, 0, 0 },
+			{ 0, 6, 0 },
+			{ 7, 0, 0 }
+		},
+		{
+			{ 9, 7, 0 },
+			{ 0, 4, 0 },
+			{ 0, 6, 2 }
+		},
+		{
+			{ 0, 0, 8 },
+			{ 0, 7, 0 },
+			{ 0, 0, 0 }
+		},
+
+	},
+	{
+		{
+			{ 0, 0, 5 },
+			{ 0, 0, 7 },
+			{ 0, 1, 6 }
+		},
+		{
+			{ 0, 9, 0 },
+			{ 8, 1, 0 },
+			{ 2, 0, 0 }
+		},
+		{
+			{ 1, 0, 0 },
+			{ 0, 0, 5 },
+			{ 0, 0, 0 }
+		},
+	}
+};
 int map[NUMS_IN_DIM][NUMS_IN_DIM] =
 {
 	{  0,  0,  0,  0,  0,  0,  0,  0,  0 },
@@ -100,17 +274,55 @@ int map[NUMS_IN_DIM][NUMS_IN_DIM] =
 	{  0,  0,  0,  0,  0,  0,  0,  0,  0 }
 };
 
+int givenrownumbers[NUMS_IN_DIM][NUMS_IN_DIM + 1] =
+{
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	//	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+};
+
+int givencolnumbers[NUMS_IN_DIM][NUMS_IN_DIM + 1] =
+{
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	//	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+};
+
+int missingindices[NUMS_IN_DIM][PAIR] = { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } };
+int boxcoord[PAIR] = { 0, 0 };
+int missingcount = 0;
+int missing[NUMS_IN_DIM];
 #else
-EXTERN int box[DIM][DIM][DIM][DIM];
-EXTERN int map[NUMS_IN_DIM][NUMS_IN_DIM];
+EXTERNDATA int box[DIM][DIM][DIM][DIM];
+EXTERNDATA int map[NUMS_IN_DIM][NUMS_IN_DIM];
+EXTERNDATA int givenrownumbers[NUMS_IN_DIM][NUMS_IN_DIM + 1];
+EXTERNDATA int givencolnumbers[NUMS_IN_DIM][NUMS_IN_DIM + 1];
+EXTERNDATA int missingindices[NUMS_IN_DIM][PAIR];
+EXTERNDATA int boxcoord[PAIR];
+EXTERNDATA int missingcount;
+EXTERNDATA int missing[NUMS_IN_DIM];
 #endif
 
-EXTERN Candidate* NewCandidate(int numbers[][DIM]);
-EXTERN void InitData();
-EXTERN void InsertCandidate(Candidate *ptr, int boxcoord[PAIR]);
-EXTERN void DeleteCandidate(Candidate *ptr, int boxcoord[PAIR]);
-EXTERN void VerifyList(Searchspace searchspace);
+EXTERNDATA Candidate* NewCandidate(int numbers[][DIM]);
+EXTERNDATA void InitData();
+EXTERNDATA void InsertCandidate(Candidate *ptr, int boxcoord[PAIR]);
+EXTERNDATA void DeleteCandidate(Candidate *ptr, int boxcoord[PAIR]);
+EXTERNDATA void VerifyList(Searchspace searchspace);
 
 //int matchseq[3][2] = {{0,1}, {1,2}, {0,2}};
-EXTERN Candidate *poss[DIM][DIM];
+EXTERNDATA Candidate *poss[DIM][DIM];
 #endif

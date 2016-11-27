@@ -1,13 +1,17 @@
+#ifndef _DATALOGGER_H_
+#define _DATALOGGER_H_
 #ifdef _DATALOGGER_C_
-#define EXTERN
+#define EXTERNDATALOGGER
 #else
-#define EXTERN extern
+#define EXTERNDATALOGGER extern
 #endif
 
 //#define _CRT_SECURE_NO_WARNINGS
 
-EXTERN void initLogger(void);
+EXTERNDATALOGGER void initLogger(void);
 
-EXTERN void WriteCandidate(Candidate *ptr);
-EXTERN void WriteString(char *str);
-EXTERN void WriteSearchSpace(int row, int col);
+EXTERNDATALOGGER void WriteCandidate(Candidate *ptr);
+EXTERNDATALOGGER void WriteString(char *str);
+EXTERNDATALOGGER void WriteSearchSpace(int row, int col);
+
+#endif
