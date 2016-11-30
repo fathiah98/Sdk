@@ -33,6 +33,7 @@ void main()
 	if (Search() == 1)
 	{
 		ShowSolution();
+		WriteResult();
 	}
 	else
 	{
