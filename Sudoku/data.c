@@ -5,7 +5,10 @@
 
 // Each box is 3x3 array of integers.
 
-/*Init Data is to be called before any other functions in this file is used */
+/*
+	InitData() is to be called before any other functions in this file is used. 
+	It clears the searchspace[][] array and any other data structures as required.
+*/
 void InitData()
 {
 	int i = 0, j = 0;
@@ -43,7 +46,7 @@ Candidate* NewCandidate(int numbers[][3])
 	return(ptr);
 }
 
-/* Insert Candidate to the front of the list */
+/* Insert Candidate to the front of the list, given a seachspace coordinate pair */
 void InsertCandidate(Candidate *ptr, int boxcoord[2])
 {
 //	Candidate *headptr = searchspace[boxcoord[0]][boxcoord[1]].candidates;
@@ -59,7 +62,7 @@ void InsertCandidate(Candidate *ptr, int boxcoord[2])
 	searchspace[boxcoord[0]][boxcoord[1]].current = ptr;
 }
 
-/* Delete the struct using a pointer to it */
+/* Delete the candidate from a particular searchspace[][] using a pointer to it */
 void DeleteCandidate(Candidate *ptr, int coord[2])
 {
 	Candidate *prev_node = NULL;
@@ -90,6 +93,10 @@ void DeleteCandidate(Candidate *ptr, int coord[2])
 	}
 }
 
+/*
+	Traverse the doubly linked list to search for errors.
+	Verify against recorded count of elements.
+*/
 void VerifyList(Searchspace searchspace)
 {
 	int nelem = 0;
