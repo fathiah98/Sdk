@@ -4,7 +4,7 @@
 #include "datalogger.h"
 #include "logic.h"
 #include "display.h"
-#include "input.h"
+#include "sudoku_io.h"
 
 void main()
 {

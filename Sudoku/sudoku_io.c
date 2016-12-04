@@ -1,9 +1,9 @@
-#define _INPUT_C_
-#include "input.h"
+#define _SUDOKU_IO_C_
+#include "sudoku_io.h"
 #include "data.h"
 #include <stdlib.h>
 #include <stdio.h>
-#define INPUTFILENAMME	"input.txt"
+#define INPUTFILENAMME		"input.txt"
 #define OUTPUTTFILENAMME	"output.txt"
 FILE *fpin = NULL;
 
@@ -35,10 +35,12 @@ void ReadInput()
 		fclose(fpin);
 	}
 }
+
+
 void WriteResult()
 {
-	int i, j, k, l;
-	char str[2];
+	int i, j;
+//	char str[2];
 
 
 	
