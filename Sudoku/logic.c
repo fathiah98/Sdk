@@ -422,12 +422,12 @@ unsigned char TraverseBox(int row, int col)
 		{
 			if ((col + 1) < DIM) // because there are three boxes per row and column
 			{
-				//				poss[row][col + 1] = searchspace[row][col + 1].candidates;
+				//	poss[row][col + 1] = searchspace[row][col + 1].candidates;
 				results = TraverseBox(row, col + 1);
 				done = results;
 				/*
 				If there is no match in the child node, reset the child node start pointer to the beginning of the candidate list.
-				Also reset the map space occupied by the previous candidate
+				Also reset the map space occupied by the previous candidate. Use the next candidate in the parent node.
 				*/
 				if (results == 0)
 				{
